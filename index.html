@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Física tipo Icfes · Ser School</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+/* Layout: una sola columna de lectura; la pregunta como hoja de examen con su caja de razonamiento debajo. */
+:root {
+  --bg: #f2f4f7; --paper: #ffffff; --ink: #18212b; --muted: #5d6875; --line: #d8dee6;
+  --accent: #1f5fbf; --accent-soft: #e6eefb; --ok: #23824a; --ok-soft: #e4f4ea; --bad: #c0392b; --bad-soft: #fbe9e7;
+  --warn: #9a6400; --warn-soft: #fff4dc; --mark: rgba(24, 33, 43, .045);
+  --sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #0f141a; --paper: #171e26; --ink: #e6ebf0; --muted: #98a3af; --line: #2a3440; --accent: #6ea3ff; --accent-soft: #1b2a42;
+    --ok: #5fcf8c; --ok-soft: #173024; --bad: #ff7b6e; --bad-soft: #3a1c19; --warn: #f0b84e; --warn-soft: #382b10; --mark: rgba(230, 235, 240, .05); color-scheme: dark; }
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--ink); font: 16px/1.55 var(--sans); }
+.wrap { max-width: 860px; margin: 0 auto; padding-block: 20px 60px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 18px; }
+.eyebrow { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+h1 { font-size: clamp(26px, 4vw, 34px); line-height: 1.15; margin: 4px 0 2px; letter-spacing: -.01em; text-wrap: balance; }
+h2 { font-size: 20px; margin: 0; }
+.card { background: var(--paper); border: 1px solid var(--line); border-radius: 14px; padding: 20px 22px; display: grid; gap: 14px; }
+label.f { display: grid; gap: 6px; font-weight: 600; font-size: 14px; }
+input[type=text], input[type=email], select { font: 16px var(--sans); padding: 10px 12px; border-radius: 9px; border: 1px solid var(--line); background: var(--paper); color: var(--ink); width: 100%; }
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 600px) { .row { grid-template-columns: 1fr; } }
+.btn { font: 600 16px var(--sans); border-radius: 10px; padding: 11px 20px; border: 1.5px solid var(--line); background: var(--paper); color: var(--ink); cursor: pointer; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, .opt:focus-within { outline: 2.5px solid var(--accent); outline-offset: 2px; }
+.msg { border-radius: 10px; padding: 10px 14px; font-size: 14.5px; }
+.msg.err { background: var(--bad-soft); color: var(--bad); }
+.msg.info { background: var(--accent-soft); color: var(--ink); }
+.msg.warn { background: var(--warn-soft); color: var(--warn); }
+.rules { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+.rules b { color: var(--ink); }
+.check { display: flex; gap: 10px; align-items: flex-start; font-size: 15px; }
+.check input { width: 18px; height: 18px; margin-top: 3px; accent-color: var(--accent); }
+.hist { font-size: 14px; color: var(--muted); margin: 0; padding-left: 18px; }
+/* Barra de la prueba */
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding-block: 10px; display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); background: var(--bg); z-index: 10; }
+.who { font-size: 13px; color: var(--muted); }
+.timer { font: 700 18px var(--sans); font-variant-numeric: tabular-nums; }
+.timer.low { color: var(--bad); }
+.nav { display: flex; flex-wrap: wrap; gap: 6px; }
+.nav button { width: 36px; height: 34px; border-radius: 8px; border: 1.5px solid var(--line); background: var(--paper); color: var(--ink); font: 600 13px var(--sans); cursor: pointer; font-variant-numeric: tabular-nums; }
+.nav button.done { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); }
+.nav button.part { background: var(--warn-soft); border-color: var(--warn); color: var(--warn); }
+.nav button[aria-current="true"] { outline: 2.5px solid var(--accent); outline-offset: 1px; }
+/* Pregunta */
+.q { -webkit-user-select: none; user-select: none; }
+.qnum { font-size: 13px; color: var(--muted); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+.stem { font: 19px/1.6 var(--serif); margin: 0; }
+.opts { display: grid; gap: 8px; }
+.opt { display: grid; grid-template-columns: 34px 1fr; gap: 10px; align-items: start; padding: 10px 12px; border: 1.5px solid var(--line); border-radius: 10px; cursor: pointer; background: var(--paper); }
+.opt input { position: absolute; opacity: 0; pointer-events: none; }
+.opt .l { width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid var(--line); display: grid; place-items: center; font-weight: 700; font-size: 14px; }
+.opt .t { font: 17px/1.5 var(--serif); padding-top: 2px; }
+.opt.sel { border-color: var(--accent); background: var(--accent-soft); }
+.opt.sel .l { background: var(--accent); border-color: var(--accent); color: #fff; }
+.why { display: grid; gap: 8px; }
+.why .lab { font-weight: 600; }
+.why .guide { font-size: 14px; color: var(--muted); margin: 0; }
+textarea { font: 16px/1.55 var(--sans); padding: 12px; border-radius: 10px; border: 1.5px solid var(--line); background: var(--paper); color: var(--ink); width: 100%; min-height: 150px; resize: vertical; -webkit-user-select: text; user-select: text; }
+.count { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.count.ok { color: var(--ok); font-weight: 600; }
+.foot { display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; align-items: center; }
+.toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--paper); padding: 10px 16px; border-radius: 10px; font-size: 14px; z-index: 20; max-width: calc(100% - 32px); }
+.watermark { position: fixed; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; display: grid; grid-template-columns: repeat(3, 1fr); align-content: space-around; transform: rotate(-24deg) scale(1.4); color: var(--mark); font: 600 15px var(--sans); white-space: nowrap; }
+.wrap { position: relative; z-index: 2; }
+.big { font-size: 40px; line-height: 1; }
+@media print { body { display: none !important; } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+</style>
+</head>
+<body>
+<div class="watermark" id="wm" aria-hidden="true" hidden></div>
+<main class="wrap">
+
+  <!-- ===== Ingreso ===== -->
+  <section id="s-ingreso" class="card">
+    <div>
+      <div class="eyebrow">Actividad de profundización · Ser School</div>
+      <h1>Física tipo Icfes</h1>
+      <div class="who">Docente: Juan Camilo Romero</div>
+    </div>
+    <div class="row">
+      <label class="f">Nombre completo<input id="nombre" type="text" autocomplete="name" maxlength="80" placeholder="Nombre y apellidos"></label>
+      <label class="f">Correo del colegio<input id="correo" type="email" autocomplete="email" maxlength="120" placeholder="nombre@serschool.edu.co"></label>
+    </div>
+    <label class="f">Grado
+      <select id="grado"><option value="">Elige tu grado</option><option value="10">Décimo (10°)</option><option value="11">Once (11°)</option></select>
+    </label>
+    <div id="ingreso-msg" class="msg err" hidden></div>
+    <div><button class="btn primary" id="b-continuar">Continuar</button></div>
+  </section>
+
+  <!-- ===== Reglas ===== -->
+  <section id="s-reglas" class="card" hidden>
+    <div>
+      <div class="eyebrow" id="r-who"></div>
+      <h2 id="r-title">Antes de empezar</h2>
+    </div>
+    <div id="r-intentos" class="msg info"></div>
+    <ol class="hist" id="r-hist" hidden></ol>
+    <ul class="rules" id="r-rules"></ul>
+    <label class="check"><input type="checkbox" id="acepto"> <span>Leí las reglas y entiendo que si salgo de esta pestaña o de la pantalla completa, el intento se cierra y se envía como esté.</span></label>
+    <div id="reglas-msg" class="msg err" hidden></div>
+    <div class="foot">
+      <button class="btn" id="b-volver">Volver</button>
+      <button class="btn primary" id="b-iniciar" disabled>Empezar el intento</button>
+    </div>
+  </section>
+
+  <!-- ===== Prueba ===== -->
+  <section id="s-prueba" hidden>
+    <div class="bar">
+      <div>
+        <div class="who" id="p-who"></div>
+        <div class="timer" id="timer" aria-live="off">--:--</div>
+      </div>
+      <div class="nav" id="nav" aria-label="Preguntas"></div>
+    </div>
+    <article class="card" id="qcard" style="margin-top:16px">
+      <div class="q" id="qbody"></div>
+      <div class="why">
+        <label class="lab" for="expl">Explica tu razonamiento con tus palabras</label>
+        <p class="guide">Escribe qué datos te da el problema, qué te pregunta y por qué eliges tu respuesta o por qué descartas al menos otra opción.</p>
+        <textarea id="expl" autocomplete="off" autocorrect="off" spellcheck="true" placeholder="Me dan… Me preguntan… Elijo ___ porque… Descarto ___ porque…"></textarea>
+        <div class="count" id="count"></div>
+      </div>
+      <div class="foot">
+        <button class="btn" id="b-ant">Anterior</button>
+        <button class="btn" id="b-sig">Siguiente</button>
+      </div>
+    </article>
+    <div class="card" style="margin-top:16px">
+      <div id="envio-msg" class="msg warn" hidden></div>
+      <div class="foot">
+        <span class="who" id="progreso"></span>
+        <button class="btn primary" id="b-enviar">Enviar intento</button>
+      </div>
+      <div id="confirmar" hidden class="msg info">
+        <p style="margin:0 0 10px">¿Seguro que quieres enviar? Después no podrás cambiar tus respuestas.</p>
+        <div class="foot" style="justify-content:flex-start"><button class="btn primary" id="b-si">Sí, enviar</button><button class="btn" id="b-no">Seguir revisando</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Final ===== -->
+  <section id="s-final" class="card" hidden>
+    <div class="big" id="f-icon"></div>
+    <h2 id="f-title"></h2>
+    <p id="f-text" style="margin:0"></p>
+    <div><button class="btn" id="b-inicio">Volver al inicio</button></div>
+  </section>
+</main>
+<div class="toast" id="toast" hidden role="status"></div>
+
+<script>
+// ============ CONFIGURACIÓN ============
+// Pega aquí la URL de la aplicación web de Google Apps Script (termina en /exec).
+const URL_SCRIPT = 'https://script.google.com/macros/s/AKfycbzhfsQSRd322KSjiFQ7v1Dn-bMJUP9HpOvem6NQ64KaX1gZSPfEF-9wU6gU79rqx42p/exec';
+// =======================================
+
+const $ = (id) => document.getElementById(id);
+const show = (id) => { for (const s of ['s-ingreso', 's-reglas', 's-prueba', 's-final']) $(s).hidden = s !== id; window.scrollTo(0, 0); };
+let toastT;
+function toast(t) { const el = $('toast'); el.textContent = t; el.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => (el.hidden = true), 3200); }
+function palabras(t) { return String(t || '').trim().split(/\s+/).filter(Boolean).length; }
+const fmtFecha = (iso) => { try { return new Date(iso).toLocaleString('es-CO', { weekday: 'long', day: 'numeric', month: 'long', hour: 'numeric', minute: '2-digit' }); } catch (e) { return iso; } };
+
+async function api(params) {
+  const u = URL_SCRIPT + '?' + new URLSearchParams(params).toString();
+  const r = await fetch(u, { method: 'GET', redirect: 'follow' });
+  return r.json();
+}
+async function apiPost(body) {
+  const r = await fetch(URL_SCRIPT, { method: 'POST', body: JSON.stringify(body), headers: { 'Content-Type': 'text/plain;charset=utf-8' }, redirect: 'follow', keepalive: true });
+  return r.json();
+}
+
+const st = { alumno: null, cfg: null, intento: null, preguntas: [], resp: [], i: 0, salidas: 0, pegados: 0, fin: 0, cerrado: false, ultimaSalida: 0, qStart: 0 };
+
+// ============ Ingreso ============
+if (!URL_SCRIPT) { const m = $('ingreso-msg'); m.hidden = false; m.className = 'msg warn'; m.textContent = 'La actividad todavía no está conectada. Avísale a tu docente.'; $('b-continuar').disabled = true; }
+$('b-continuar').onclick = async () => {
+  const nombre = $('nombre').value.trim(), correo = $('correo').value.trim().toLowerCase(), grado = $('grado').value, m = $('ingreso-msg');
+  m.hidden = true;
+  if (nombre.split(/\s+/).length < 2) { m.hidden = false; m.textContent = 'Escribe tu nombre y al menos un apellido.'; return; }
+  if (!correo.includes('@')) { m.hidden = false; m.textContent = 'Escribe tu correo del colegio.'; return; }
+  if (!grado) { m.hidden = false; m.textContent = 'Elige tu grado.'; return; }
+  $('b-continuar').disabled = true; $('b-continuar').textContent = 'Consultando…';
+  try {
+    const r = await api({ accion: 'estado', correo, grado });
+    if (!r.ok) { m.hidden = false; m.textContent = r.error; return; }
+    st.alumno = { nombre, correo, grado }; st.cfg = r.config;
+    renderReglas(r);
+    show('s-reglas');
+  } catch (e) { m.hidden = false; m.textContent = 'No hay conexión con el servidor. Revisa tu internet e inténtalo de nuevo.'; }
+  finally { $('b-continuar').disabled = false; $('b-continuar').textContent = 'Continuar'; }
+};
+function renderReglas(r) {
+  const c = r.config, a = st.alumno, quedan = c.intentosMax - r.usados;
+  $('r-who').textContent = `${a.nombre} · Grado ${a.grado}°`;
+  $('r-intentos').textContent = c.cerrada ? 'La actividad ya está cerrada.' : quedan > 0
+    ? `Has usado ${r.usados} de ${c.intentosMax} intentos. Te ${quedan === 1 ? 'queda 1 intento' : 'quedan ' + quedan + ' intentos'}. Cada intento tiene preguntas distintas.`
+    : `Ya usaste tus ${c.intentosMax} intentos.`;
+  $('r-intentos').className = 'msg ' + (quedan > 0 && !c.cerrada ? 'info' : 'err');
+  const h = $('r-hist'); h.hidden = !r.historial.length;
+  h.innerHTML = r.historial.map((x) => `<li>Intento ${x.n}: ${x.estado}${x.motivo ? ' · ' + x.motivo : ''}</li>`).join('');
+  $('r-rules').innerHTML = [
+    `Son <b>20 preguntas</b> de selección múltiple tipo Icfes. Lo importante no es acertar todas, sino mostrar tu razonamiento.`,
+    `En cada pregunta debes escribir tu explicación con <b>mínimo ${c.minPalabras} palabras</b>: qué datos te dan, qué te preguntan y por qué eliges o descartas opciones.`,
+    `Tienes <b>${c.tiempoMaxMin} minutos</b>. Cuando el tiempo se acabe, el intento se envía solo.`,
+    `La prueba se abre en pantalla completa. <b>Si cambias de pestaña, de ventana o de aplicación, o sales de la pantalla completa, el intento se cierra</b> y se envía como esté.`,
+    `Si recargas o cierras la página, el intento también se cierra y cuenta como usado.`,
+    `No se puede pegar ni copiar texto. Escribe todo tú.`,
+    `No se permite usar inteligencia artificial. Tu docente puede pedirte que expliques en voz alta cualquiera de tus respuestas.`,
+    c.fechaCierre ? `La actividad se cierra el <b>${fmtFecha(c.fechaCierre)}</b>.` : '',
+  ].filter(Boolean).map((t) => `<li>${t}</li>`).join('');
+  $('acepto').checked = false; $('b-iniciar').disabled = true;
+  $('b-iniciar').hidden = quedan <= 0 || c.cerrada;
+  $('acepto').parentElement.hidden = quedan <= 0 || c.cerrada;
+  $('b-iniciar').textContent = `Empezar el intento ${r.usados + 1}`;
+}
+$('acepto').onchange = () => { $('b-iniciar').disabled = !$('acepto').checked; };
+$('b-volver').onclick = () => show('s-ingreso');
+
+// ============ Iniciar ============
+$('b-iniciar').onclick = async () => {
+  const m = $('reglas-msg'); m.hidden = true;
+  $('b-iniciar').disabled = true; $('b-iniciar').textContent = 'Preparando preguntas…';
+  try { if (document.documentElement.requestFullscreen && !document.fullscreenElement) await document.documentElement.requestFullscreen({ navigationUI: 'hide' }); } catch (e) { /* sin pantalla completa */ }
+  try {
+    const r = await api({ accion: 'iniciar', ...st.alumno });
+    if (!r.ok) { m.hidden = false; m.textContent = r.error; salirFullscreen(); $('b-iniciar').disabled = false; $('b-iniciar').textContent = 'Empezar el intento'; return; }
+    st.intento = r; st.cfg = r.config; st.preguntas = r.preguntas; st.i = 0; st.salidas = 0; st.pegados = 0; st.cerrado = false;
+    st.resp = r.preguntas.map((q) => ({ id: q.id, eleccion: '', explicacion: '', segundos: 0, teclas: 0 }));
+    st.fin = Date.now() + r.config.tiempoMaxMin * 60000;
+    st.qStart = Date.now();
+    const wm = $('wm'); wm.innerHTML = Array.from({ length: 45 }, () => `<span>${st.alumno.nombre} · ${st.alumno.correo}</span>`).join(''); wm.hidden = false;
+    $('p-who').textContent = `${st.alumno.nombre} · Grado ${st.alumno.grado}° · Intento ${r.numero} de ${r.config.intentosMax}`;
+    show('s-prueba'); renderNav(); renderQ(); tick(); vigilando = true;
+  } catch (e) { m.hidden = false; m.textContent = 'No se pudo iniciar. Revisa tu conexión e inténtalo de nuevo.'; salirFullscreen(); $('b-iniciar').disabled = false; $('b-iniciar').textContent = 'Empezar el intento'; }
+};
+function salirFullscreen() { try { if (document.fullscreenElement) document.exitFullscreen(); } catch (e) {} }
+
+// ============ Preguntas ============
+const L = ['A', 'B', 'C', 'D'];
+function guardarTiempo() { const r = st.resp[st.i]; if (r) r.segundos += Math.round((Date.now() - st.qStart) / 1000); st.qStart = Date.now(); }
+function estadoQ(k) { const r = st.resp[k]; const okW = palabras(r.explicacion) >= st.cfg.minPalabras; return r.eleccion && okW ? 'done' : (r.eleccion || r.explicacion) ? 'part' : ''; }
+function renderNav() {
+  $('nav').innerHTML = st.preguntas.map((q, k) => `<button class="${estadoQ(k)}" aria-current="${k === st.i}" data-k="${k}" aria-label="Pregunta ${k + 1}">${k + 1}</button>`).join('');
+  const done = st.resp.filter((_, k) => estadoQ(k) === 'done').length;
+  $('progreso').textContent = `${done} de ${st.preguntas.length} preguntas completas`;
+}
+$('nav').onclick = (e) => { const b = e.target.closest('button'); if (b) ir(+b.dataset.k); };
+function ir(k) { if (k < 0 || k >= st.preguntas.length) return; guardarTiempo(); st.i = k; renderQ(); renderNav(); document.getElementById('qcard').scrollIntoView({ block: 'start' }); }
+function esc(t) { return String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+function renderQ() {
+  const q = st.preguntas[st.i], r = st.resp[st.i];
+  $('qbody').innerHTML = `<div class="qnum">Pregunta ${st.i + 1} de ${st.preguntas.length}</div>
+    <p class="stem">${esc(q.enunciado)}</p>
+    <div class="opts" role="radiogroup" aria-label="Opciones">${q.opciones.map((o, j) => `
+      <label class="opt ${r.eleccion === L[j] ? 'sel' : ''}"><input type="radio" name="op" value="${L[j]}" ${r.eleccion === L[j] ? 'checked' : ''}><span class="l">${L[j]}</span><span class="t">${esc(o)}</span></label>`).join('')}
+    </div>`;
+  $('qbody').querySelectorAll('input[type=radio]').forEach((inp) => inp.onchange = () => { r.eleccion = inp.value; renderQ(); renderNav(); });
+  $('expl').value = r.explicacion; contar();
+  $('b-ant').disabled = st.i === 0; $('b-sig').disabled = st.i === st.preguntas.length - 1;
+}
+function contar() { const n = palabras($('expl').value), m = st.cfg.minPalabras; const c = $('count'); c.textContent = n >= m ? `${n} palabras ✓` : `${n} de ${m} palabras mínimas`; c.className = 'count' + (n >= m ? ' ok' : ''); }
+$('expl').addEventListener('input', () => { st.resp[st.i].explicacion = $('expl').value; contar(); renderNav(); });
+$('expl').addEventListener('keydown', (e) => { if (e.key.length === 1 || e.key === 'Backspace' || e.key === 'Enter') st.resp[st.i].teclas++; });
+$('b-ant').onclick = () => ir(st.i - 1);
+$('b-sig').onclick = () => ir(st.i + 1);
+
+// ============ Bloqueos ============
+['paste', 'drop'].forEach((ev) => document.addEventListener(ev, (e) => { if (!$('s-prueba').hidden) { e.preventDefault(); st.pegados++; toast('No se puede pegar texto. Escribe tu explicación con tus palabras.'); } }, true));
+['copy', 'cut', 'contextmenu', 'dragstart'].forEach((ev) => document.addEventListener(ev, (e) => { if (!$('s-prueba').hidden) e.preventDefault(); }, true));
+document.addEventListener('beforeinput', (e) => { if (!$('s-prueba').hidden && (e.inputType === 'insertFromPaste' || e.inputType === 'insertFromDrop')) { e.preventDefault(); st.pegados++; toast('No se puede pegar texto.'); } }, true);
+document.addEventListener('keydown', (e) => { if (!$('s-prueba').hidden && (e.ctrlKey || e.metaKey) && ['p', 's', 'u'].includes(e.key.toLowerCase())) e.preventDefault(); });
+
+// ============ Vigilancia de salidas ============
+let vigilando = false;
+function salida(motivo) {
+  if (!vigilando || st.cerrado) return;
+  const ahora = Date.now();
+  if (ahora - st.ultimaSalida < 1500) return; // un mismo cambio dispara varios eventos
+  st.ultimaSalida = ahora; st.salidas++;
+  if (st.salidas > st.cfg.salidasPermitidas) cerrar(motivo, true);
+  else toast(`Advertencia: ${motivo.toLowerCase()}. Si vuelve a pasar, el intento se cierra.`);
+}
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') salida('Salió de la pestaña o minimizó la ventana'); });
+window.addEventListener('blur', () => salida('Cambió de ventana o de aplicación'));
+document.addEventListener('fullscreenchange', () => { if (!document.fullscreenElement) salida('Salió de la pantalla completa'); });
+window.addEventListener('pagehide', () => { if (vigilando && !st.cerrado) cerrar('Cerró o recargó la página', true); });
+window.addEventListener('beforeunload', (e) => { if (vigilando && !st.cerrado) { e.preventDefault(); e.returnValue = ''; } });
+
+// ============ Tiempo ============
+function tick() {
+  if (st.cerrado || $('s-prueba').hidden) return;
+  const ms = st.fin - Date.now();
+  if (ms <= 0) { cerrar('Tiempo agotado', false); return; }
+  const m = Math.floor(ms / 60000), s = Math.floor(ms / 1000) % 60;
+  $('timer').textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  $('timer').className = 'timer' + (ms < 5 * 60000 ? ' low' : '');
+  setTimeout(tick, 500);
+}
+
+// ============ Envío ============
+function paquete(motivo) {
+  guardarTiempo();
+  return { accion: 'enviar', id: st.intento.id, correo: st.alumno.correo, motivo, salidas: st.salidas, pegados: st.pegados, respuestas: st.resp };
+}
+async function cerrar(motivo, porSalida) {
+  if (st.cerrado) return;
+  st.cerrado = true; vigilando = false;
+  const body = paquete(motivo);
+  let enviado = false;
+  if (porSalida && navigator.sendBeacon) {
+    enviado = navigator.sendBeacon(URL_SCRIPT, new Blob([JSON.stringify(body)], { type: 'text/plain;charset=utf-8' }));
+  }
+  if (!enviado) { try { await apiPost(body); enviado = true; } catch (e) { enviado = false; } }
+  salirFullscreen(); $('wm').hidden = true;
+  final(porSalida ? 'cerrado' : 'tiempo', motivo, enviado);
+}
+$('b-enviar').onclick = () => {
+  const falt = st.resp.map((_, k) => k).filter((k) => estadoQ(k) !== 'done');
+  const m = $('envio-msg');
+  if (falt.length) { m.hidden = false; m.textContent = `Te falta completar ${falt.length === 1 ? 'la pregunta' : 'las preguntas'} ${falt.map((k) => k + 1).join(', ')}: elige una opción y escribe mínimo ${st.cfg.minPalabras} palabras.`; return; }
+  m.hidden = true; $('confirmar').hidden = false;
+};
+$('b-no').onclick = () => { $('confirmar').hidden = true; };
+$('b-si').onclick = async () => {
+  $('b-si').disabled = true; $('b-si').textContent = 'Enviando…';
+  vigilando = false;
+  try {
+    const r = await apiPost(paquete('Enviado por el estudiante'));
+    if (!r.ok) throw new Error(r.error);
+    st.cerrado = true; salirFullscreen(); $('wm').hidden = true;
+    final('ok', '', true, r.intentosRestantes);
+  } catch (e) {
+    vigilando = true; $('b-si').disabled = false; $('b-si').textContent = 'Sí, enviar';
+    $('envio-msg').hidden = false; $('envio-msg').textContent = 'No se pudo enviar. Revisa tu conexión y vuelve a intentarlo sin salir de esta página.';
+  }
+};
+function final(tipo, motivo, enviado, quedan) {
+  show('s-final');
+  const t = { ok: ['✓', 'Intento enviado', `Tus respuestas quedaron registradas.${quedan !== undefined ? ` Te ${quedan === 1 ? 'queda 1 intento' : 'quedan ' + quedan + ' intentos'}.` : ''}`],
+    cerrado: ['!', 'El intento se cerró', `Motivo: ${motivo}. Las respuestas que alcanzaste a escribir se enviaron y este intento cuenta como usado.`],
+    tiempo: ['⏱', 'Se acabó el tiempo', 'Tus respuestas se enviaron tal como estaban.'] }[tipo];
+  $('f-icon').textContent = t[0]; $('f-title').textContent = t[1];
+  $('f-text').textContent = t[2] + (enviado ? '' : ' No se pudo confirmar el envío por falta de conexión; avísale a tu docente.');
+}
+$('b-inicio').onclick = () => location.reload();
+</script>
+</body>
+</html>
