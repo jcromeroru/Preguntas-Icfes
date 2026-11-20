@@ -226,7 +226,7 @@ function renderReglas(r) {
     `La prueba se abre en pantalla completa. <b>Si cambias de pestaña, de ventana o de aplicación, o sales de la pantalla completa, el intento se cierra</b> y se envía como esté.`,
     `Si recargas o cierras la página, el intento también se cierra y cuenta como usado.`,
     `No se puede pegar ni copiar texto. Escribe todo tú.`,
-    `No se permite usar inteligencia artificial. Tu docente puede pedirte que expliques en voz alta cualquiera de tus respuestas.`,
+    `No se permite usar inteligencia artificial.`,
     c.fechaCierre ? `La actividad se cierra el <b>${fmtFecha(c.fechaCierre)}</b>.` : '',
   ].filter(Boolean).map((t) => `<li>${t}</li>`).join('');
   $('acepto').checked = false; $('b-iniciar').disabled = true;
